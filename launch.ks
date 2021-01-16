@@ -1,7 +1,7 @@
 //launch.ks
-// SWITCH TO 1.
-// COPYPATH("0:launch", "").
-// RUN launch. // RUNPATH("launch"). // runpath("launch",90,90000,True). // run launch(90,90000,True).
+// SWITCH TO 1. -> COPYPATH("0:launch", ""). -> RUN launch.
+// or else: RUNPATH("launch"). // runpath("launch",90,90000,True). // run launch(90,90000,True).
+// AG5 (Action Group 5) is Fairing or Escape Tower
 parameter compass is 90, finalApoapsis is 80000, fairingOrEscape is True.
 
 set targetPitch to 90. //LAUNCH
@@ -13,7 +13,7 @@ function main {
   CLEARSCREEN.
   print "compass heading is " + compass + "°".
   print "finalApoapsis is " + finalApoapsis + "m".
-  print "fairingOrEscape on AG5 (Action Group 5) is " + fairingOrEscape.
+  print "fairingOrEscape on AG5 is " + fairingOrEscape.
 
   doLaunch().
   doAscent().
@@ -48,7 +48,6 @@ function doLaunch {
 }
 
 function doAscent {
-  //set targetPitch to 90.
   set targetDirection to compass.
   set targetRoll to 0.
   wait until verticalSpeed >= 60.
@@ -91,7 +90,8 @@ function doCirculate {
   set mnvTime to maneuverBurnTime(mnv).
   set startTime to TIME:SECONDS + ETA:APOAPSIS - (mnvTime / 2).
   set throttleTime to startTime + mnvTime - 0.5.
-  wait until time:seconds > startTime - 30. //warpto(startTime - 30).
+  //warpto(startTime - 30).
+  wait until time:seconds > startTime - 30.
   lock steering to mnv:burnvector.
   wait until time:seconds > startTime.
   lock throttle to 1.
@@ -108,9 +108,9 @@ function maneuverDeltaV {
   local my is constant:G * Kerbin:Mass.
   local r is SHIP:APOAPSIS + kerbinRadius.
   local a is Orbit:SEMIMAJORAXIS.
-  local Vf is sqrt(my / r).         // The Velocity of any object in finalOrbit
+  local Vf is sqrt(my / r).  // The Velocity of any object in finalOrbit
   local Vi is sqrt(my * ((2/r) - (1/a))). // The Velocity at apoapsis
-  local dV is Vf - Vi.      // Velocity-Difference from one orbit to the other.
+  local dV is Vf - Vi.  // Velocity-Difference from one orbit to the other.
 
   print "calculated dV: " + CEILING(dV,2) + "m/s.".
   return dV.
