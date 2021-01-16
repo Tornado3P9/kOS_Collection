@@ -1,25 +1,30 @@
 //launch.ks
 // SWITCH TO 1.
 // COPYPATH("0:launch", "").
-// RUN launch. // RUNPATH("launch"). // runpath("launch",90,90000,1). // run launch(90,90000,1).
-parameter compass is 90, finalApoapsis is 85000, pitchFactor is 0.4.
+// RUN launch. // RUNPATH("launch"). // runpath("launch",90,90000,True). // run launch(90,90000,True).
+// AG5 (Action Group 5) is Fairing or Escape Tower
+parameter compass is 90, finalApoapsis is 80000, fairingOrEscape is True.
+
+set targetPitch to 90.
 
 function main {
 
   CLEARSCREEN.
   print "compass heading is " + compass + "°".
   print "finalApoapsis is " + finalApoapsis + "m".
-  print "pitchFactor is " + pitchFactor.
 
   doLaunch().
   doAscent().
   until apoapsis > finalApoapsis {
     doAutoStage().
+    if targetPitch < 1 {
+      set targetPitch to 0.
+    }
   }
   doShutdown().
   doCirculate().
 
-  print "program exited.".
+  print "script exited.".
 }
 
 // LAUNCH:
@@ -42,17 +47,12 @@ function doLaunch {
 }
 
 function doAscent {
-  set targetPitch to 90.
+  //set targetPitch to 90.
   set targetDirection to compass.
   set targetRoll to 0.
   wait until verticalSpeed >= 60.
   print "pitching maneuver started.".
-  until targetPitch < (88.963 - 1.03287 * alt:radar^0.409511) {
-    set targetPitch to targetPitch - pitchFactor.
-    lock steering to heading(targetDirection, targetPitch, targetRoll).
-    wait 0.5.
-  }
-  lock targetPitch to 88.963 - 1.03287 * alt:radar^0.409511.
+  lock targetPitch to 90 - 0.00178 * ship:altitude.
   lock steering to heading(targetDirection, targetPitch, targetRoll).
 }
 
@@ -76,13 +76,25 @@ function doShutdown {
 // CIRCULATE:
 
 function doCirculate {
-  until ship:altitude > 70005 {
-    PRINT "SHIP:APOAPSIS " + ROUND(SHIP:APOAPSIS,0) AT (0,18).
-    PRINT "SHIP:PERIAPSIS " + ROUND(SHIP:PERIAPSIS,0) AT (0,19).
+  // until ship:altitude > 70005 {
+  //   PRINT "SHIP:APOAPSIS " + ROUND(SHIP:APOAPSIS,0) AT (0,21).
+  //   PRINT "SHIP:PERIAPSIS " + ROUND(SHIP:PERIAPSIS,0) AT (0,22).
+  // }
+  wait until ship:altitude > 70005.
+  if fairingOrEscape {
+    PRINT "AG5 on.".
+    set AG5 to True.
+    WAIT 0.5.
   }
+  lock steering to heading(targetDirection, 0, 0).
   // wait until ship:altitude > 70005.
+  print "".
   print "Calc. Circulation Maneuv.".
   set burnTime to getManeuverBurnTime().
+  if burnTime = 0 {
+    print "aborting doCirculate()".
+    return 0.
+  }
   // Set the start and end times.
   set start_time to abs(time:seconds + eta:apoapsis - (burnTime / 2)).
   set end_time to abs(time:seconds + eta:apoapsis + (burnTime / 2)).
@@ -107,15 +119,23 @@ function doCirculate {
 }
 
 function getManeuverBurnTime {
-  // local my is constant:G * Kerbin:Mass.               // 3531.6. Km^3/s^2
+  local kerbinRadius is 600000.
+  // local my is constant:G * Kerbin:Mass. // 3531.6. Km^3/s^2
   local my is 3531.6.
-  local r is 600 + (finalApoapsis / 1000).                     // z.B. 85Km (600Km = Kerbin Radius)
-  local a is (ship:apoapsis + ship:periapsis + 1200000) / 2000.    // Semimajor Axis
-  local Vf is sqrt(my / r).                           // The Velocity of any object in that orbit.
-  local Vi is sqrt(-(my / a) + ((2 * my) / r)).       // The Velocity of any object in that orbit.
-  local dV is (Vf - Vi) * 1000.                       // Velocity-Difference from one orbit to the other.
-  
-  print "calculated dV: " + CEILING(dV,2) + "m/s.".              // Calculated using VisVivaEquation.
+  local r is (finalApoapsis + kerbinRadius) / 1000. // z.B. 85Km (600Km = Kerbin Radius)
+  if ship:apoapsis < -599999 {
+    print "aborting getManeuverBurnTime()".
+    abort on.
+    unlock all.
+    return 0.
+  }
+  local a is ((ship:apoapsis + kerbinRadius) + (ship:periapsis + kerbinRadius)) / 2000.  // Semimajor Axis
+  //local a is Orbit:SEMIMAJORAXIS.
+  local Vf is sqrt(my / r).               // The Velocity of any object in finalOrbit
+  local Vi is sqrt(my * ((2/r) - (1/a))). // The Velocity at apoapsis
+  local dV is (Vf - Vi) * 1000.           // Velocity-Difference from one orbit to the other.
+
+  print "calculated dV: " + CEILING(dV,2) + "m/s.".  // Calculated using VisVivaEquation.
   local g0 is 9.80655.
   local isp is 0.
 
