@@ -1,19 +1,10 @@
 // LANDER.KS -- An automated landing script.
-//
-// A script for the kOs mod for Kerbal Space Program
-//   by Quill18 (http://youtube.com/quill18)
-//
-// Get the latest version here: https://gist.github.com/quill18/bbddb8135cdd84479132
 
-// PHASE 0: Variables and settings
-
-// The altitude radar reading is from the center of mass (I think), and not
-// from the base of your landing gear. You need to give the script a hint
-// as to the height offset so it correctly cuts the engines just before
-// touch down.
 // Recommended that you test your lander on the ground with a script that
 // just prints ALT:RADAR to the terminal.
-SET SHIP_RADAR_HEIGHT TO 5.
+parameter SHIP_RADAR_HEIGHT is 5.
+print "SHIP_RADAR_HEIGHT is " + SHIP_RADAR_HEIGHT.
+print " ".
 
 // PHASE 1: Point the right way!
 

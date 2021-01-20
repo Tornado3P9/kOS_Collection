@@ -1,4 +1,4 @@
-//landing.ks
+//landing.ks Reentry staging on AG10
 function main {
   CLEARSCREEN.
   print "started return maneuver".
@@ -7,23 +7,26 @@ function main {
 }
 
 function doLanding {
+  SAS OFF.
   lock steering to retrograde.
+  print "waiting until altitude < 75Km"
   wait until SHIP:altitude < 75000.
   // Do reentry staging
-  abort on.
+  print "AG10 on: staging before reentry"
+  set AG10 to True.
   // lock steering to surface retrograde
-  lock steering to retrograde.
+  lock steering to SRFRETROGRADE.
   doParachute().
-  // on touchdown do
-  wait until VERTICALSPEED = 0.
-  wait 5.
   unlock all.
+  // on touchdown do
+  wait until SHIP:STATUS = "LANDED".
+  SAS ON.
 }
 
 function doParachute {
   wait until myAltitude < 2000.
   print "parachutes".
-  set AG10 to True.
+  CHUTES ON.
 }
 
 // realAltitude = round(bounds_box:BOTTOMALTRADAR, 1).

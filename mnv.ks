@@ -9,14 +9,37 @@ function executeManeuverNode {
   // addManeuverToFlightPlan(mnv).
   set startTime to calculateStartTime(mnv).
   set throttleTime to startTime + mnvTime - 0.5.
+  //warpto(startTime - 10).
   wait until time:seconds > startTime - 30.
   lockSteeringAtManeuverTarget(mnv).
   wait until time:seconds > startTime.
   lock throttle to 1.
-  wait until isManeuverComplete(mnv).
+  until isManeuverComplete(mnv) {
+    doAutoStage().
+  }
   lock throttle to 0.
   removeManeuverFromFlightPlan(mnv).
 }
+
+// STAGING:
+
+function doSafeStage {
+  wait until stage:ready.
+  stage.
+  print "staging.".
+}
+
+function doAutoStage {
+  if not(defined oldThrust) {
+    declare global oldThrust to ship:availablethrust.
+  }
+  if ship:availableThrust < (oldThrust - 10) {
+    doSafeStage(). wait 1.
+    set oldThrust to ship:availablethrust.
+  }
+}
+
+// MANEUVER:
 
 function addManeuverToFlightPlan {
   parameter mnv.
@@ -32,7 +55,7 @@ function calculateStartTime {
 
 function maneuverBurnTime {
   parameter mnv.
-  local dV is mnv:deltaV:mag. //Oder VisVivaEquation
+  local dV is mnv:deltaV:mag.
   local g0 is 9.80665.
   local isp is 0.
 
