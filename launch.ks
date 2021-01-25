@@ -5,8 +5,6 @@
 parameter compass is 90, finalApoapsis is 80000, fairingOrEscape is True.
 
 SET targetPitch TO 90. //LAUNCH
-SET T TO 0. //LAUNCH
-LOCK THROTTLE TO T. //LAUNCH
 SET mnvTime TO 0. //CIRCULATE
 SET throttleTime TO 0. //CIRCULATE
 
@@ -24,7 +22,6 @@ function main {
     if targetPitch < 1 {
       set targetPitch to 1.
     }
-    //doAutoThrottle(). //TODO!
   }
   doShutdown().
   doCirculate().
@@ -45,7 +42,7 @@ function doLaunch {
     PRINT "..." + countdown.
     WAIT 1.
   }
-  SET T TO 1. //THROTTLE
+  lock THROTTLE to 1.
   doSafeStage().
   lock steering to heading(90, 90, 270).
 }
@@ -56,7 +53,7 @@ function doAscent {
   wait until verticalSpeed >= 60.
   print "pitching maneuver started.".
   lock targetPitch to 1.92308E-8 * ship:altitude^2 - 0.00263462 * ship:altitude + 90.
-  //lock targetPitch to 90 - 0.00178 * ship:altitude. //Linear
+  lock THROTTLE TO MAX(0.4, (1/90) * targetPitch).
   lock steering to heading(targetDirection, targetPitch, targetRoll).
 }
 
@@ -70,17 +67,8 @@ function doAutoStage {
   }
 }
 
-function doAutoThrottle {
-  if( ETA:APOAPSIS > 59 ) and (ALT:RADAR < 50000) {
-    SET T TO MAX(0, T - 0.1). //THROTTLE
-  }
-  else {
-    SET T TO MIN(1, T). //THROTTLE
-  }
-}
-
 function doShutdown {
-  SET T TO 0.
+  lock THROTTLE to 0.
   // lock steering to prograde + R(0,0,270).
   lock steering to prograde.
   print "shutting down and holding prograde.".
@@ -106,9 +94,9 @@ function doCirculate {
   wait until time:seconds > startTime - 30.
   lock steering to mnv:burnvector.
   wait until time:seconds > startTime.
-  SET T TO 1. //THROTTLE
+  lock THROTTLE to 1.
   wait until isManeuverComplete(mnv).
-  SET T TO 0. //THROTTLE
+  lock THROTTLE to 0.
   remove mnv. //removeManeuverFromFlightPlan
   print "burn finished.".
   unlock all.
@@ -152,7 +140,7 @@ function maneuverBurnTime {
 function isManeuverComplete {
   parameter mnv.
   if time:seconds > throttleTime {
-    SET T TO 0.2.
+    lock THROTTLE to 0.2.
   }
   if not(defined originalVector) or originalVector = -1 {
     declare global originalVector to mnv:burnvector.
