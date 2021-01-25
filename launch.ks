@@ -52,8 +52,9 @@ function doAscent {
   set targetRoll to 0.
   wait until verticalSpeed >= 60.
   print "pitching maneuver started.".
-  lock targetPitch to 1.92308E-8 * ship:altitude^2 - 0.00263462 * ship:altitude + 90.
-  lock THROTTLE TO MAX(0.4, (1/90) * targetPitch).
+  //lock targetPitch to 1.92308E-8 * ship:altitude^2 - 0.00263462 * ship:altitude + 90.
+  lock targetPitch to 1.48272E-8 * ship:altitude^2 - 0.00229755 * ship:altitude + 90.
+  lock THROTTLE TO MAX(0.55, (1/90) * targetPitch).
   lock steering to heading(targetDirection, targetPitch, targetRoll).
 }
 
@@ -89,16 +90,18 @@ function doCirculate {
   add mnv. //addManeuverToFlightPlan
   set mnvTime to maneuverBurnTime(mnv).
   set startTime to TIME:SECONDS + ETA:APOAPSIS - (mnvTime / 2).
-  set throttleTime to startTime + mnvTime - 0.5.
-  //warpto(startTime - 30).
+  set throttleTime to startTime + mnvTime - 0.3.
+  //warpto(startTime - 40). //your choice whether to uncomment or not
   wait until time:seconds > startTime - 30.
   lock steering to mnv:burnvector.
   wait until time:seconds > startTime.
   lock THROTTLE to 1.
   wait until isManeuverComplete(mnv).
   lock THROTTLE to 0.
+  lock steering to prograde.
   remove mnv. //removeManeuverFromFlightPlan
   print "burn finished.".
+  WAIT 1. //For steering to settle down a bit
   unlock all.
   SET SHIP:CONTROL:PILOTMAINTHROTTLE TO 0.
 }
