@@ -4,11 +4,11 @@
 // AG5 (Action Group 5) is Fairing or Escape Tower
 parameter compass is 90, finalApoapsis is 80000, fairingOrEscape is True.
 
-set targetPitch to 90. //LAUNCH
+SET targetPitch TO 90. //LAUNCH
 SET T TO 0. //LAUNCH
 LOCK THROTTLE TO T. //LAUNCH
-set mnvTime to 0. //CIRCULATE
-set throttleTime to 0. //CIRCULATE
+SET mnvTime TO 0. //CIRCULATE
+SET throttleTime TO 0. //CIRCULATE
 
 function main {
 
@@ -45,7 +45,7 @@ function doLaunch {
     PRINT "..." + countdown.
     WAIT 1.
   }
-  lock throttle to 1.
+  SET T TO 1. //THROTTLE
   doSafeStage().
   lock steering to heading(90, 90, 270).
 }
@@ -72,10 +72,10 @@ function doAutoStage {
 
 function doAutoThrottle {
   if( ETA:APOAPSIS > 59 ) and (ALT:RADAR < 50000) {
-    SET T TO MAX(0, T - 0.1).
+    SET T TO MAX(0, T - 0.1). //THROTTLE
   }
   else {
-    SET T TO MIN(1, T).
+    SET T TO MIN(1, T). //THROTTLE
   }
 }
 
@@ -106,9 +106,9 @@ function doCirculate {
   wait until time:seconds > startTime - 30.
   lock steering to mnv:burnvector.
   wait until time:seconds > startTime.
-  lock throttle to 1.
+  SET T TO 1. //THROTTLE
   wait until isManeuverComplete(mnv).
-  lock throttle to 0.
+  SET T TO 0. //THROTTLE
   remove mnv. //removeManeuverFromFlightPlan
   print "burn finished.".
   unlock all.
@@ -143,7 +143,7 @@ function maneuverBurnTime {
 
   local mf is ship:mass / constant():e^(dV / (isp * g0)).
   local fuelFlow is ship:availablethrust / (isp * g0).
-  local t is (ship:mass - mf) / fuelFlow.
+  local t is (ship:mass - mf) / fuelFlow. //maneuverBurnTime
 
   print "maneuverBurnTime: " + CEILING(t,2) + "s.".
   return t.
