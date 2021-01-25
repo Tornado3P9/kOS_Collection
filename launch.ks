@@ -24,7 +24,7 @@ function main {
     if targetPitch < 1 {
       set targetPitch to 1.
     }
-    doAutoThrottle().
+    //doAutoThrottle(). //TODO!
   }
   doShutdown().
   doCirculate().
