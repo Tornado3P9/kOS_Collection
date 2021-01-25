@@ -5,6 +5,8 @@
 parameter compass is 90, finalApoapsis is 80000, fairingOrEscape is True.
 
 set targetPitch to 90. //LAUNCH
+SET T TO 0. //LAUNCH
+LOCK THROTTLE TO T. //LAUNCH
 set mnvTime to 0. //CIRCULATE
 set throttleTime to 0. //CIRCULATE
 
@@ -22,6 +24,7 @@ function main {
     if targetPitch < 1 {
       set targetPitch to 1.
     }
+    doAutoThrottle().
   }
   doShutdown().
   doCirculate().
@@ -64,6 +67,15 @@ function doAutoStage {
   if ship:availableThrust < (oldThrust - 10) {
     doSafeStage(). wait 1.
     set oldThrust to ship:availablethrust.
+  }
+}
+
+function doAutoThrottle {
+  if( ETA:APOAPSIS > 59 ) and (ALT:RADAR < 50000) {
+    SET T TO MAX(0, T - 0.1).
+  }
+  else {
+    SET T TO MIN(1, T).
   }
 }
 

@@ -2,7 +2,7 @@
 
 // Recommended that you test your lander on the ground with a script that
 // just prints ALT:RADAR to the terminal.
-parameter SHIP_RADAR_HEIGHT is 5.
+parameter SHIP_RADAR_HEIGHT is 3.75.
 print "SHIP_RADAR_HEIGHT is " + SHIP_RADAR_HEIGHT.
 print " ".
 
@@ -17,7 +17,7 @@ WAIT 3.
 // PHASE 2: Kill our horizontal velocity (surface speed)
 
 PRINT "KILLING HORIZONTAL VELOCITY".
-UNTIL SHIP:SURFACESPEED < 25 {
+UNTIL SHIP:GROUNDSPEED < 25 {
 	LOCK THROTTLE TO 1.
 	WAIT 0.01.
 }

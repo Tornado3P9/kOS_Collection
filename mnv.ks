@@ -8,13 +8,13 @@ function executeManeuverNode {
   local mnv is nextNode.
   // addManeuverToFlightPlan(mnv).
   set startTime to calculateStartTime(mnv).
-  set throttleTime to startTime + mnvTime - 0.5.
+  set throttleTime to startTime + mnvTime - 0.2.
   //warpto(startTime - 10).
   wait until time:seconds > startTime - 30.
   lockSteeringAtManeuverTarget(mnv).
   wait until time:seconds > startTime.
   lock throttle to 1.
-  until isManeuverComplete(mnv) {
+  UNTIL isManeuverComplete(mnv){
     doAutoStage().
   }
   lock throttle to 0.
@@ -30,12 +30,8 @@ function doSafeStage {
 }
 
 function doAutoStage {
-  if not(defined oldThrust) {
-    declare global oldThrust to ship:availablethrust.
-  }
-  if ship:availableThrust < (oldThrust - 10) {
-    doSafeStage(). wait 1.
-    set oldThrust to ship:availablethrust.
+  if ship:availableThrust = 0 {
+    doSafeStage(). WAIT 0.001.
   }
 }
 
