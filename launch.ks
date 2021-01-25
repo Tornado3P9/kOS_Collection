@@ -80,7 +80,7 @@ function doAutoThrottle {
 }
 
 function doShutdown {
-  lock throttle to 0.
+  SET T TO 0.
   // lock steering to prograde + R(0,0,270).
   lock steering to prograde.
   print "shutting down and holding prograde.".
@@ -152,7 +152,7 @@ function maneuverBurnTime {
 function isManeuverComplete {
   parameter mnv.
   if time:seconds > throttleTime {
-    lock throttle to 0.2.
+    SET T TO 0.2.
   }
   if not(defined originalVector) or originalVector = -1 {
     declare global originalVector to mnv:burnvector.
