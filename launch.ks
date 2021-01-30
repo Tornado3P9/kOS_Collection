@@ -53,6 +53,7 @@ function doAscent {
   wait until verticalSpeed >= 60.
   print "pitching maneuver started.".
   //lock targetPitch to 1.92308E-8 * ship:altitude^2 - 0.00263462 * ship:altitude + 90.
+  //lock targetPitch to 1.05884E-8 * ship:altitude^2 - 0.0020129 * ship:altitude + 90.0137.
   lock targetPitch to 1.48272E-8 * ship:altitude^2 - 0.00229755 * ship:altitude + 90.
   lock THROTTLE TO MAX(0.55, (1/90) * targetPitch).
   lock steering to heading(targetDirection, targetPitch, targetRoll).

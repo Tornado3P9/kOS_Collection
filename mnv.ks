@@ -32,7 +32,7 @@ function doSafeStage {
 
 function doAutoStage {
   if ship:availableThrust = 0 {
-    doSafeStage(). WAIT 0.001.
+    doSafeStage().
   }
 }
 
