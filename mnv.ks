@@ -53,7 +53,8 @@ function calculateStartTime {
 function maneuverBurnTime {
   parameter mnv.
   local dV is mnv:deltaV:mag.
-  local g0 is 9.80665.
+  local g0 is ship:Body:MU.
+  //print "Body g0 is: " + g0.
   local isp is 0.
 
   list engines in myEngines.
@@ -84,10 +85,6 @@ function isManeuverComplete {
     return true.
   }
   return false.
-  // after 3/4 of burntime have passed:
-  // set steering to mnv:burningvector.
-  // als Ersatz fuer SAS:StabilityControl gegen Ende des Maneuverburns,
-  // denn der burnvector schlaegt gegen Ende manchmal ziemlich zur Seite aus!
 }
 
 // executeManeuverNode(time:seconds + 30, 100, 100, 100).

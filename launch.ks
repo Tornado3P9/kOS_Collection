@@ -123,7 +123,7 @@ function maneuverDeltaV {
 function maneuverBurnTime {
   parameter mnv.
   local dV is mnv:deltaV:mag.
-  local g0 is 9.80665.
+  local g0 is constant:G * Kerbin:Mass. //Gravitational parameter of Kerbin
   local isp is 0.
 
   list engines in myEngines.
@@ -133,7 +133,7 @@ function maneuverBurnTime {
     }
   }
 
-  local mf is ship:mass / constant():e^(dV / (isp * g0)).
+  local mf is ship:mass / constant:e^(dV / (isp * g0)).
   local fuelFlow is ship:availablethrust / (isp * g0).
   local t is (ship:mass - mf) / fuelFlow. //maneuverBurnTime
 
