@@ -1,6 +1,7 @@
 //launch.ks
 // SWITCH TO 1. -> COPYPATH("0:launch", ""). -> RUN launch.
 // or else: RUNPATH("launch"). // runpath("launch",90,90000,True,-1). // run launch(90,90000,True,-1).
+// also possible to only change the first ones: run launch(90,90000).
 // AG5 (Action Group 5) is Fairing or Escape Tower
 // throttleOfSecondStage is automaticly calculated if not specified at start (-1 means not specified)
 parameter compass is 90, finalApoapsis is 80000, fairingOrEscape is True, throttleOfSecondStage is -1.
@@ -11,24 +12,29 @@ SET throttleTime TO 0. //CIRCULATE
 
 function main {
 
-  CLEARSCREEN.
-  print "compass heading is " + compass + "°".
-  print "finalApoapsis is " + finalApoapsis + "m".
-  print "fairingOrEscape on AG5 is " + fairingOrEscape.
-  print "throttleOfSecondStage is " + throttleOfSecondStage.
-  print " ".
-
+  displaySettings().
   doLaunch().
   doAscent().
   until apoapsis > finalApoapsis {
     doAutoStage().
-    if targetPitch < 1 {
-      set targetPitch to 1.
+    if targetPitch < 3 {
+      set targetPitch to 3.
     }
   }
   doShutdown().
   doCirculate().
   print "script exited.".
+}
+
+//
+
+function displaySettings {
+  CLEARSCREEN.
+  print "compass heading is " + compass + "°".
+  print "finalApoapsis is " + finalApoapsis + "m".
+  print "fairingOrEscape on AG5 is " + fairingOrEscape.
+  if throttleOfSecondStage > 0 {print "throttleOfSecondStage is " + throttleOfSecondStage.}
+  print " ".
 }
 
 // LAUNCH:

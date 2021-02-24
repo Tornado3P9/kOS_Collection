@@ -3,10 +3,7 @@ set mnvTime to 0.
 set throttleTime to 0.
 
 function executeManeuverNode {
-  // parameter utime, radial, normal, prograde.
-  // local mnv is node(utime, radial, normal, prograde).
   local mnv is nextNode.
-  // addManeuverToFlightPlan(mnv).
   set startTime to calculateStartTime(mnv).
   set throttleTime to startTime + mnvTime - 0.3.
   //warpto(startTime - 40). //your choice whether to uncomment or not
@@ -67,11 +64,6 @@ function isManeuverComplete {
     return true.
   }
   return false.
-  // after 3/4 of burntime have passed:
-  // set steering to mnv:burningvector.
-  // als Ersatz fuer SAS:StabilityControl gegen Ende des Maneuverburns,
-  // denn der burnvector schlaegt gegen Ende manchmal ziemlich zur Seite aus!
 }
 
-// executeManeuverNode(time:seconds + 30, 100, 100, 100).
 executeManeuverNode().
