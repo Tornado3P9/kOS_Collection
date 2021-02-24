@@ -1,9 +1,8 @@
-//launch.ks
+//electron.ks
 // SWITCH TO 1. -> COPYPATH("0:launch", ""). -> RUN launch.
-// or else: RUNPATH("launch"). // runpath("launch",90,90000,True,-1). // run launch(90,90000,True,-1).
+// or else: RUNPATH("launch"). // runpath("launch",90,90000,True). // run launch(90,90000,True).
 // AG5 (Action Group 5) is Fairing or Escape Tower
-// throttleOfSecondStage is automaticly calculated if not specified at start (-1 means not specified)
-parameter compass is 90, finalApoapsis is 80000, fairingOrEscape is True, throttleOfSecondStage is -1.
+parameter compass is 90, finalApoapsis is 80000, fairingOrEscape is True.
 
 SET targetPitch TO 90. //LAUNCH
 SET mnvTime TO 0. //CIRCULATE
@@ -15,15 +14,13 @@ function main {
   print "compass heading is " + compass + "°".
   print "finalApoapsis is " + finalApoapsis + "m".
   print "fairingOrEscape on AG5 is " + fairingOrEscape.
-  print "throttleOfSecondStage is " + throttleOfSecondStage.
-  print " ".
 
   doLaunch().
   doAscent().
   until apoapsis > finalApoapsis {
     doAutoStage().
-    if targetPitch < 1 {
-      set targetPitch to 1.
+    if targetPitch < 3 {
+      set targetPitch to 3.
     }
   }
   doShutdown().
@@ -67,9 +64,7 @@ function doAutoStage {
     declare global oldThrust to ship:availablethrust.
   }
   if ship:availableThrust < (oldThrust - 10) {
-    doSafeStage().
-    if throttleOfSecondStage > 0 {lock THROTTLE to throttleOfSecondStage.}
-    wait 1.
+    doSafeStage(). wait 1. lock THROTTLE to 1.
     set oldThrust to ship:availablethrust.
   }
 }
@@ -78,13 +73,13 @@ function doShutdown {
   lock THROTTLE to 0.
   // lock steering to prograde + R(0,0,270).
   lock steering to prograde.
+  RCS on.
   print "shutting down and holding prograde.".
 }
 
 // CIRCULATE:
 
 function doCirculate {
-  print " ".
   wait until ship:altitude > 70005.
   if fairingOrEscape {
     PRINT "AG5 on.".
@@ -101,7 +96,6 @@ function doCirculate {
   //warpto(startTime - 40). //your choice whether to uncomment or not
   wait until time:seconds > startTime - 30.
   lock steering to mnv:burnvector.
-  print "locking steering to maneuver target".
   wait until time:seconds > startTime.
   lock THROTTLE to 1.
   wait until isManeuverComplete(mnv).
@@ -111,6 +105,7 @@ function doCirculate {
   print "burn finished.".
   WAIT 1. //For steering to settle down a bit
   unlock all.
+  RCS off.
   SET SHIP:CONTROL:PILOTMAINTHROTTLE TO 0.
 }
 

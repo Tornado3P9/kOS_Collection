@@ -14,29 +14,11 @@ function executeManeuverNode {
   lock steering to mnv:burnvector. //lockSteeringAtManeuverTarget
   wait until time:seconds > startTime.
   lock throttle to 1.
-  UNTIL isManeuverComplete(mnv){
-    doAutoStage().
-  }
+  wait until isManeuverComplete(mnv).
   lock throttle to 0.
   remove mnv. //removeManeuverFromFlightPlan
   print "script exited.".
 }
-
-// STAGING:
-
-function doSafeStage {
-  wait until stage:ready.
-  stage.
-  print "staging.".
-}
-
-function doAutoStage {
-  if ship:availableThrust = 0 {
-    doSafeStage().
-  }
-}
-
-// MANEUVER:
 
 function addManeuverToFlightPlan {
   parameter mnv.
@@ -85,6 +67,10 @@ function isManeuverComplete {
     return true.
   }
   return false.
+  // after 3/4 of burntime have passed:
+  // set steering to mnv:burningvector.
+  // als Ersatz fuer SAS:StabilityControl gegen Ende des Maneuverburns,
+  // denn der burnvector schlaegt gegen Ende manchmal ziemlich zur Seite aus!
 }
 
 // executeManeuverNode(time:seconds + 30, 100, 100, 100).
