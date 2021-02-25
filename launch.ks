@@ -1,6 +1,7 @@
 //launch.ks
-// SWITCH TO 1. -> COPYPATH("0:launch", ""). -> RUN launch.
-// or else: RUNPATH("launch"). // runpath("launch",90,90000,True,-1). // run launch(90,90000,True,-1).
+// switch to 0. -> list. -> run launch(90,100000,True).
+// or else: SWITCH TO 1. -> COPYPATH("0:launch", ""). -> RUN launch.
+// RUNPATH("launch"). // runpath("launch",90,90000,True,-1). // run launch(90,90000,True,-1).
 // also possible to only change the first ones: run launch(90,90000).
 // AG5 (Action Group 5) is Fairing or Escape Tower
 // throttleOfSecondStage is automaticly calculated if not specified at start (-1 means not specified)
@@ -13,6 +14,8 @@ SET throttleTime TO 0. //CIRCULATE
 function main {
 
   displaySettings().
+  armAG5Trigger().
+
   doLaunch().
   doAscent().
   until apoapsis > finalApoapsis {
@@ -26,7 +29,24 @@ function main {
   print "script exited.".
 }
 
-//
+// function armAbort {
+//   on ABORT {
+//     lock THROTTLE to 0.
+//     lock steering to prograde.
+//     wait 0.5.
+//     set AG9 to true. //abort actions work better on AG9
+//     wait 5.
+//     lock steering to retrograde.
+//     RCS on.
+//     set AG5 to true.
+//     wait until ALT:RADAR < 2000.
+//     print "parachutes".
+//     CHUTES ON.
+//     unlock all.
+//     RCS off.
+//     wait until 1 = 0. //script needs to be aborted with "STRG+C"
+//   }
+// }
 
 function displaySettings {
   CLEARSCREEN.
@@ -35,6 +55,15 @@ function displaySettings {
   print "fairingOrEscape on AG5 is " + fairingOrEscape.
   if throttleOfSecondStage > 0 {print "throttleOfSecondStage is " + throttleOfSecondStage.}
   print " ".
+}
+
+function armAG5Trigger {
+  if fairingOrEscape {
+    WHEN ship:altitude > 70005 THEN {
+      PRINT "AG5 on.".
+      set AG5 to True.
+    }
+  }
 }
 
 // LAUNCH:
@@ -90,13 +119,9 @@ function doShutdown {
 // CIRCULATE:
 
 function doCirculate {
-  print " ".
+  print "Starting circulation sequence:".
   wait until ship:altitude > 70005.
-  if fairingOrEscape {
-    PRINT "AG5 on.".
-    set AG5 to True.
-    WAIT 0.5.
-  }
+  WAIT 1.
   set mnvDeltaV to maneuverDeltaV().
   // parameter utime, radial, normal, prograde.
   local mnv is node(TIME:SECONDS + ETA:APOAPSIS, 0, 0, mnvDeltaV).
@@ -112,10 +137,11 @@ function doCirculate {
   lock THROTTLE to 1.
   wait until isManeuverComplete(mnv).
   lock THROTTLE to 0.
-  lock steering to prograde.
+  lock steering to prograde. //mnv:burnvector goes crazy at end of burn
   remove mnv. //removeManeuverFromFlightPlan
   print "burn finished.".
-  WAIT 1. //For steering to settle down a bit
+  print "waiting for steering to settle down a bit".
+  WAIT 3.
   unlock all.
   SET SHIP:CONTROL:PILOTMAINTHROTTLE TO 0.
 }
