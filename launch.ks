@@ -29,24 +29,7 @@ function main {
   print "script exited.".
 }
 
-// function armAbort {
-//   on ABORT {
-//     lock THROTTLE to 0.
-//     lock steering to prograde.
-//     wait 0.5.
-//     set AG9 to true. //abort actions work better on AG9
-//     wait 5.
-//     lock steering to retrograde.
-//     RCS on.
-//     set AG5 to true.
-//     wait until ALT:RADAR < 2000.
-//     print "parachutes".
-//     CHUTES ON.
-//     unlock all.
-//     RCS off.
-//     wait until 1 = 0. //script needs to be aborted with "STRG+C"
-//   }
-// }
+// PREPARATION
 
 function displaySettings {
   CLEARSCREEN.
@@ -60,19 +43,13 @@ function displaySettings {
 function armAG5Trigger {
   if fairingOrEscape {
     WHEN ship:altitude > 70005 THEN {
-      PRINT "AG5 on.".
       set AG5 to True.
+      PRINT "AG5 on.".
     }
   }
 }
 
 // LAUNCH:
-
-function doSafeStage {
-  wait until stage:ready.
-  stage.
-  print "staging.".
-}
 
 function doLaunch {
   PRINT "Counting down:".
@@ -90,8 +67,6 @@ function doAscent {
   set targetRoll to 0.
   wait until verticalSpeed >= 60.
   print "pitching maneuver started.".
-  //lock targetPitch to 1.92308E-8 * ship:altitude^2 - 0.00263462 * ship:altitude + 90.
-  //lock targetPitch to 1.05884E-8 * ship:altitude^2 - 0.0020129 * ship:altitude + 90.0137.
   lock targetPitch to 1.48272E-8 * ship:altitude^2 - 0.00229755 * ship:altitude + 90.
   lock THROTTLE TO MAX(0.55, (1/90) * targetPitch).
   lock steering to heading(targetDirection, targetPitch, targetRoll).
@@ -109,9 +84,14 @@ function doAutoStage {
   }
 }
 
+function doSafeStage {
+  wait until stage:ready.
+  stage.
+  print "staging.".
+}
+
 function doShutdown {
   lock THROTTLE to 0.
-  // lock steering to prograde + R(0,0,270).
   lock steering to prograde.
   print "shutting down and holding prograde.".
 }
@@ -119,7 +99,7 @@ function doShutdown {
 // CIRCULATE:
 
 function doCirculate {
-  print "Starting circulation sequence:".
+  print ">>begin circulation sequence<<".
   wait until ship:altitude > 70005.
   WAIT 1.
   set mnvDeltaV to maneuverDeltaV().
@@ -140,7 +120,7 @@ function doCirculate {
   lock steering to prograde. //mnv:burnvector goes crazy at end of burn
   remove mnv. //removeManeuverFromFlightPlan
   print "burn finished.".
-  print "waiting for steering to settle down a bit".
+  print "waiting for steering to settle down".
   WAIT 3.
   unlock all.
   SET SHIP:CONTROL:PILOTMAINTHROTTLE TO 0.

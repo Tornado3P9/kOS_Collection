@@ -3,16 +3,19 @@ set mnvTime to 0.
 set throttleTime to 0.
 
 function executeManeuverNode {
+  clearscreen.
   local mnv is nextNode.
   set startTime to calculateStartTime(mnv).
   set throttleTime to startTime + mnvTime - 0.3.
-  //warpto(startTime - 40). //your choice whether to uncomment or not
+  warpto(startTime - 40). //your choice whether to uncomment or not
   wait until time:seconds > startTime - 30.
   lock steering to mnv:burnvector. //lockSteeringAtManeuverTarget
   wait until time:seconds > startTime.
   lock throttle to 1.
   wait until isManeuverComplete(mnv).
   lock throttle to 0.
+  unlock all.
+  sas on.
   remove mnv. //removeManeuverFromFlightPlan
   print "script exited.".
 }
