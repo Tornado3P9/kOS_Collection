@@ -4,10 +4,12 @@ set throttleTime to 0.
 
 function executeManeuverNode {
   clearscreen.
+  sas off.
   local mnv is nextNode.
   set startTime to calculateStartTime(mnv).
   set throttleTime to startTime + mnvTime - 0.3.
   warpto(startTime - 40). //your choice whether to uncomment or not
+  print "waiting until startTime".
   wait until time:seconds > startTime - 30.
   lock steering to mnv:burnvector. //lockSteeringAtManeuverTarget
   wait until time:seconds > startTime.

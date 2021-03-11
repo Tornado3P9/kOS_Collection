@@ -101,7 +101,7 @@ function doShutdown {
 function doCirculate {
   print ">>begin circulation sequence<<".
   wait until ship:altitude > 70005.
-  WAIT 1.
+  WAIT 1. //to make sure that AG5 action has finished
   set mnvDeltaV to maneuverDeltaV().
   // parameter utime, radial, normal, prograde.
   local mnv is node(TIME:SECONDS + ETA:APOAPSIS, 0, 0, mnvDeltaV).
