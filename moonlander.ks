@@ -1,6 +1,8 @@
-parameter shipheight is 3.88, deorbit is True. //shipheight is the radar altitude when landed with legs extended.
+// run moonlander(3.88,True).
 
-set radarOffset to 40 + shipheight. //first hold at 40m above ground
+parameter shipheight is 3.88, deorbit is False. //shipheight is the radar altitude when landed with legs extended.
+
+set radarOffset to 10 + shipheight. //first hold at 10m above ground
 lock trueRadar to alt:radar - radarOffset. //suicide burn calculation...
 lock g to constant:g * body:mass / body:radius^2.
 lock maxDecel to (ship:availablethrust / ship:mass) - g.
