@@ -12,6 +12,7 @@ function executeManeuverNode {
   print "waiting until startTime".
   wait until time:seconds > startTime - 30.
   lock steering to mnv:burnvector. //lockSteeringAtManeuverTarget
+  doCircCountdown().
   wait until time:seconds > startTime.
   lock throttle to 1.
   wait until isManeuverComplete(mnv).
@@ -54,6 +55,14 @@ function maneuverBurnTime {
 
   print "maneuverBurnTime: " + round(t) + "s.".
   return t.
+}
+
+function doCircCountdown {
+  wait until time:seconds > startTime - 5. print "...5".
+  wait until time:seconds > startTime - 4. print "...4".
+  wait until time:seconds > startTime - 3. print "...3".
+  wait until time:seconds > startTime - 2. print "...2".
+  wait until time:seconds > startTime - 1. print "...1".
 }
 
 function isManeuverComplete {
